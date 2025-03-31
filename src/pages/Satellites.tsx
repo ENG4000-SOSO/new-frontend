@@ -1,25 +1,21 @@
-import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
-  CloseButton,
-  Dialog,
-  For,
-  HStack,
-  Field,
-  Input,
-  Stack,
-  Portal,
-  NumberInput,
   Card,
+  CloseButton,
   Code,
-  Image,
+  Dialog,
+  Field,
   Icon,
-  Separator
-} from "@chakra-ui/react"
-import { useForm, Controller } from "react-hook-form"
+  Input,
+  NumberInput,
+  Portal,
+  Separator,
+  Stack} from "@chakra-ui/react";
+import { toaster } from '@components/ui/toaster';
 import api from '@utils/api';
-import { toaster } from '@components/ui/toaster'
+import { useEffect, useState } from 'react';
+import { Controller,useForm } from "react-hook-form";
 import { MdOutlineSatelliteAlt } from 'react-icons/md';
 
 interface SatelliteRequest {
@@ -54,7 +50,7 @@ const Satellites = () => {
       const res = await api.get<Satellite[]>("/assets/satellites");
       setSatellites(res.data);
     } catch (e) {
-      toaster.create({ title: "Failed to fetch satellites", description: String(e), type: "error" })
+      toaster.create({ title: "Failed to fetch satellites", description: String(e), type: "error" });
       console.log(e);
     }
   };
@@ -64,7 +60,7 @@ const Satellites = () => {
       await api.post("/assets/satellite", data);
       await fetchSatellites();
     } catch (e) {
-      toaster.create({ title: "Login Failed", description: String(e), type: "error" })
+      toaster.create({ title: "Login Failed", description: String(e), type: "error" });
       console.log(e);
     }
   };

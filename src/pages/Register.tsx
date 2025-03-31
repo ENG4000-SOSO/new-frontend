@@ -1,17 +1,16 @@
-import React from 'react';
 import {
   Box,
   Button,
   Field,
-  Input,
-  Stack,
   Heading,
-  Text,
-  Link
-} from "@chakra-ui/react"
-import { useForm } from "react-hook-form"
-import api from "@utils/api"
-import { toaster } from '@components/ui/toaster'
+  Input,
+  Link,
+  Stack,
+  Text} from "@chakra-ui/react";
+import { toaster } from '@components/ui/toaster';
+import api from "@utils/api";
+import React from 'react';
+import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
 
 type RegisterFormData = {
@@ -36,9 +35,9 @@ const Register: React.FC = () => {
     try {
       const res = api.post("/auth", data);
       console.log(await (await res).data);
-      navigate("/login")
+      navigate("/login");
     } catch (e) {
-      toaster.create({title: "Register Failed", description: String(e), type: "error"})
+      toaster.create({title: "Register Failed", description: String(e), type: "error"});
       console.log(e);
     }
   };

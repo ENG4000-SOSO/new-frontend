@@ -1,19 +1,19 @@
-import React from 'react';
 import {
   Box,
   Button,
   Field,
-  Input,
-  Stack,
   Heading,
+  Input,
   Link,
+  Stack,
   Text
-} from "@chakra-ui/react"
-import { useForm } from "react-hook-form"
-import api from "@utils/api"
-import { toaster } from '@components/ui/toaster'
+} from "@chakra-ui/react";
+import { toaster } from '@components/ui/toaster';
+import { useAuth } from '@context/auth/auth_context';
+import api from "@utils/api";
+import React from 'react';
+import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@context/auth_context';
 
 type LoginFormData = {
   username: string;
@@ -39,7 +39,7 @@ const Register: React.FC = () => {
       login({"username": data.username, token: body.token});
       navigate("/");
     } catch (e) {
-      toaster.create({ title: "Login Failed", description: String(e), type: "error" })
+      toaster.create({ title: "Login Failed", description: String(e), type: "error" });
       console.log(e);
     }
   };

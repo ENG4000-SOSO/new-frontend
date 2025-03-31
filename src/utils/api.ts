@@ -26,7 +26,7 @@ api.interceptors.response.use(
   (response) => {
     if (response.config.url === "/auth/token" && response.config.method?.toLowerCase() === "post") {
       if (response.data.access_token) {
-        console.log(response.data.access_token)
+        console.log(response.data.access_token);
         localStorage.setItem("jwt", response.data.access_token);
       }
     }

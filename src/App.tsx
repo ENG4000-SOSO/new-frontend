@@ -1,11 +1,12 @@
-import './App.css'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { useAuth } from '@context/auth_context';
+import './App.css';
+
 import Layout from '@components/Layout';
+import { useAuth } from '@context/auth/auth_context';
 import Home from '@pages/Home';
-import Satellites from '@pages/Satellites';
+import Login from "@pages/Login";
 import Register from '@pages/Register';
-import Login from "@pages/Login"
+import Satellites from '@pages/Satellites';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 function App() {
 
@@ -26,4 +27,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

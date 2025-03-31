@@ -1,6 +1,6 @@
-import { Box, Flex, Button, Spacer } from '@chakra-ui/react';
+import { Box, Button, Flex, Spacer } from '@chakra-ui/react';
+import { useAuth } from '@context/auth/auth_context';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@context/auth_context';
 
 const Navbar = () => {
 
