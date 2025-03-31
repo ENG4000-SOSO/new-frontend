@@ -10,26 +10,25 @@ const Navbar = () => {
     <Box bg="white" shadow="sm" p={4} position="fixed" width="100%" top={0} zIndex={1}>
       <Flex>
         <Box>
-          <Button variant="solid" color="white">
+          <Button asChild variant="ghost">
             <Link to="/">Home</Link>
           </Button>
-          {user ? (
+        </Box>
+        <Spacer />
+        <Box>
+          <Button asChild variant="ghost">
+            <Link to="/satellites">Satellites</Link>
+          </Button>
+          <Button asChild variant="ghost">
+            <Link to="/groundstations">Ground Station</Link>
+          </Button>
+        </Box>
+        <Spacer />
+        {user ? (
             <Button variant="solid" color="white" onClick={logout}>Logout</Button>
           ) : (
             <></>
           )}
-        </Box>
-        {/* <Spacer />
-        <Box>
-          <Button variant="solid" color="white">
-            <Link to="/about">About</Link>
-          </Button>
-        </Box>
-        <Box ml={4}>
-          <Button variant="solid" color="white">
-            <Link to="/contact">Contact</Link>
-          </Button>
-        </Box> */}
       </Flex>
     </Box>
   );
