@@ -1,13 +1,32 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 
+function decodeJwt(token: string): any {
+  try {
+    const payload = token.split('.')[1];
+    const decodedPayload = window.atob(payload);
+    return JSON.parse(decodedPayload);
+  } catch (e) {
+    throw new Error("Invalid token");
+  }
+}
+
+// Update the User interface to include role
 interface User {
   username: string;
   token: string;
+  role: string;
+}
+
+interface DecodedToken {
+  name: string;
+  id: number;
+  role: string;
+  exp: number;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (userData: User) => void;
+  login: (userData: { username: string; token: string }) => void;
   logout: () => void;
 }
 
@@ -19,9 +38,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  const login = (userData: User) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+  const login = (userData: { username: string; token: string }) => {
+    let decoded: DecodedToken;
+    try {
+      decoded = decodeJwt(userData.token);
+    } catch (e) {
+      console.error("Failed to decode token", e);
+      return;
+    }
+    const userWithRole: User = {
+      username: userData.username,
+      token: userData.token,
+      role: decoded.role, // Extracted from token
+    };
+    setUser(userWithRole);
+    localStorage.setItem("user", JSON.stringify(userWithRole));
   };
 
   const logout = () => {
