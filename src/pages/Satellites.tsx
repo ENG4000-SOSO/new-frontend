@@ -11,28 +11,14 @@ import {
   NumberInput,
   Portal,
   Separator,
-  Stack} from "@chakra-ui/react";
+  Stack
+} from "@chakra-ui/react";
 import { toaster } from '@components/ui/toaster';
 import api from '@utils/api';
 import { useEffect, useState } from 'react';
 import { Controller,useForm } from "react-hook-form";
 import { MdOutlineSatelliteAlt } from 'react-icons/md';
-
-interface SatelliteRequest {
-  tle_line1: string;
-  tle_line2: string;
-  satellite_name: string;
-  storage_capacity?: number;
-  power_capacity?: number;
-  fov_max?: number;
-  fov_min?: number;
-  is_illuminated?: boolean;
-  under_outage?: boolean;
-};
-
-interface Satellite extends SatelliteRequest {
-  id: number;
-};
+import { SatelliteType, SatelliteRequestType } from "@customTypes/satellite";
 
 const Satellites = () => {
 
@@ -41,13 +27,13 @@ const Satellites = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SatelliteRequest>();
+  } = useForm<SatelliteRequestType>();
 
-  const [satellites, setSatellites] = useState<Satellite[]>([]);
+  const [satellites, setSatellites] = useState<SatelliteType[]>([]);
 
   const fetchSatellites = async () => {
     try {
-      const res = await api.get<Satellite[]>("/assets/satellites");
+      const res = await api.get<SatelliteType[]>("/assets/satellites");
       setSatellites(res.data);
     } catch (e) {
       toaster.create({ title: "Failed to fetch satellites", description: String(e), type: "error" });
@@ -55,12 +41,13 @@ const Satellites = () => {
     }
   };
 
-  const createSatellite = async (data: SatelliteRequest) => {
+  const createSatellite = async (data: SatelliteRequestType) => {
     try {
       await api.post("/assets/satellite", data);
       await fetchSatellites();
+      toaster.create({ title: "Satellite created", type: "success" });
     } catch (e) {
-      toaster.create({ title: "Login Failed", description: String(e), type: "error" });
+      toaster.create({ title: "Satellite creation failed", description: String(e), type: "error" });
       console.log(e);
     }
   };
@@ -121,7 +108,7 @@ const Satellites = () => {
                             </NumberInput.Root>
                           )}
                         />
-                        <Input {...register("storage_capacity")} />
+                        {/* <Input {...register("storage_capacity")} /> */}
                         <Field.ErrorText>{errors.storage_capacity?.message}</Field.ErrorText>
                       </Field.Root>
                       <Button type="submit">Create</Button>
