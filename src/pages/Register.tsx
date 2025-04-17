@@ -1,10 +1,17 @@
-import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/form-control";
-import { Box, Button, Heading, Input, Stack, Text } from "@chakra-ui/react";
-import { toaster } from "@components/ui/toaster";
+import {
+  Box,
+  Button,
+  Heading,
+  Input,
+  Link,
+  Stack,
+  Text
+} from "@chakra-ui/react";
+import { toaster } from '@components/ui/toaster';
 import api from "@utils/api";
-import React from "react";
+import React from 'react';
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 type RegisterFormData = {
   username: string;
@@ -20,22 +27,12 @@ const Register: React.FC = () => {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      await api.post("/auth", data);
-      toaster.create({
-        title: "Registration Successful",
-        description: "Your account has been created. Please log in.",
-        type: "success",
-      });
+      const res = api.post("/auth", data);
+      console.log(await (await res).data);
       navigate("/login");
-    } catch (e: any) {
-      // Extract error detail if available
-      const errorMessage = e.response?.data?.detail || "Registration failed. Please try again.";
-      toaster.create({
-        title: "Register Failed",
-        description: errorMessage,
-        type: "error",
-      });
-      console.error(e);
+    } catch (e) {
+      toaster.create({title: "Register Failed", description: String(e), type: "error"});
+      console.log(e);
     }
   };
 

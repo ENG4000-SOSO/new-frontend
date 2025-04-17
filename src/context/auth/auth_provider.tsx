@@ -1,36 +1,6 @@
-import { createContext, ReactNode, useContext, useState } from "react";
-
-function decodeJwt(token: string): any {
-  try {
-    const payload = token.split('.')[1];
-    const decodedPayload = window.atob(payload);
-    return JSON.parse(decodedPayload);
-  } catch (e) {
-    throw new Error("Invalid token");
-  }
-}
-
-// Update the User interface to include role
-interface User {
-  username: string;
-  token: string;
-  role: string;
-}
-
-interface DecodedToken {
-  name: string;
-  id: number;
-  role: string;
-  exp: number;
-}
-
-interface AuthContextType {
-  user: User | null;
-  login: (userData: { username: string; token: string }) => void;
-  logout: () => void;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { AuthContext } from "@context/auth/auth_context";
+import { User } from "@context/auth/auth_types";
+import { ReactNode, useState } from "react";
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(() => {
@@ -65,12 +35,4 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
 };
