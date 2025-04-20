@@ -10,7 +10,7 @@ import {
   Stack,
   Text
 } from "@chakra-ui/react";
-import { useAuth } from "@context/auth_context";
+import { useAuth } from "@context/auth/auth_context";
 import React, { useEffect, useState } from "react";
 import { FaBuilding, FaExclamationTriangle, FaImage, FaSatellite } from "react-icons/fa";
 import { Link as RouterLink } from "react-router-dom";

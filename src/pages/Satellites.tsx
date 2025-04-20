@@ -14,6 +14,7 @@ import {
   Stack
 } from "@chakra-ui/react";
 import { toaster } from '@components/ui/toaster';
+import { useAuth } from "@context/auth/auth_context";
 import { SatelliteRequestType, SatelliteType } from "@customTypes/satellite";
 import api from '@utils/api';
 import { useEffect, useState } from 'react';
@@ -22,7 +23,6 @@ import { MdOutlineSatelliteAlt } from 'react-icons/md';
 
 const Satellites: React.FC = () => {
   const { user } = useAuth();
-  const [satellites, setSatellites] = useState<Satellite[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState<boolean>(false);
