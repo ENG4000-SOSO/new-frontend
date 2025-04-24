@@ -8,6 +8,7 @@ import {
   Field,
   Icon,
   Input,
+  // NumberInput,
   Portal,
   Separator,
   Stack
@@ -22,7 +23,7 @@ import { GrSatellite } from 'react-icons/gr';
 const GroundStations = () => {
 
   const {
-    control,
+    // control,
     register,
     handleSubmit,
     formState: { errors },

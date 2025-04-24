@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8000"
+  // baseURL: "http://localhost:8000"
+  // baseURL: "http://44.195.89.245:8000"
+  baseURL: "https://soso.danieldigiovanni.com"
 });
 
 api.interceptors.request.use(

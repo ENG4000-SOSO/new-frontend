@@ -1,0 +1,61 @@
+.schedule-container {
+  width: 100%;
+  overflow-x: scroll;
+  font-family: sans-serif;
+  color: black;
+}
+
+.time-header {
+  overflow-x: scroll;
+  display: flex;
+  border-bottom: 1px solid #ccc;
+  background: #f9f9f9;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.time-cell {
+  flex: 1;
+  min-width: 80px;
+  text-align: center;
+  padding: 4px 0;
+  border-left: 1px solid #eee;
+  font-size: 12px;
+}
+
+.schedule-body {
+  display: flex;
+  overflow: scroll;
+  flex-direction: column;
+}
+
+.employee-row {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  border-bottom: 1px solid #eee;
+}
+
+.employee-name {
+  width: 100px;
+  padding: 0 8px;
+  font-weight: bold;
+  background: #f0f0f0;
+  flex-shrink: 0;
+}
+
+.timeline {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  background: #fff;
+}
+
+.block {
+  position: absolute;
+  top: 4px;
+  height: 32px;
+  background-color: #3b82f6;
+  border-radius: 4px;
+}

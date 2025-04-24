@@ -20,12 +20,8 @@ const Register: React.FC = () => {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      await api.post("/auth", data);
-      toaster.create({
-        title: "Registration Successful",
-        description: "Your account has been created. Please log in.",
-        type: "success",
-      });
+      const res = api.post("/auth/", data);
+      console.log(await (await res).data);
       navigate("/login");
     } catch (e: any) {
       // Extract error detail if available

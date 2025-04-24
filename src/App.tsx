@@ -7,11 +7,8 @@ import Mission from '@pages/Mission';
 import Missions from '@pages/Missions';
 import Register from '@pages/Register';
 import Satellites from '@pages/Satellites';
-import Schedule from "@pages/Schedule";
-
+import Schedule from '@pages/Schedule';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import './App.css';
-
 
 function App() {
 
@@ -23,7 +20,10 @@ function App() {
         <Routes>
           <Route path="/" element={user ? <Home /> : <Login />} />
           <Route path="/satellites" element={user ? <Satellites /> : <Login />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/groundstations" element={user ? <GroundStations /> : <Login />} />
+          <Route path="/missions" element={user ? <Missions /> : <Login />} />
+          <Route path="/missions/:id" element={user ? <Mission /> : <Login />} />
+          <Route path="/schedule/:id" element={user ? <Schedule /> : <Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/ground-stations" element={user ? <GroundStations /> : <Login />} />
           <Route path="/schedule" element={user ? <Schedule /> : <Login />} />
