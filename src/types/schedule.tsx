@@ -26,6 +26,8 @@ export interface TwoLineElement {
 };
 
 export interface Job {
+  latitude: number;
+  longitude: number;
   priority: number;
   start: string;
   end: string;
@@ -34,6 +36,8 @@ export interface Job {
 };
 
 export interface GroundStation {
+  latitude: number;
+  longitude: number;
   height: number;
   mask: number;
   uplink_rate: number;

@@ -12,6 +12,7 @@ import {
   // Steps,
   // StepsChangeDetails,
   Spinner,
+  Highlight,
 } from "@chakra-ui/react";
 import { toaster } from '@components/ui/toaster';
 import api from '@utils/api';
@@ -23,10 +24,11 @@ import minMax from 'dayjs/plugin/minMax';
 import './schedule.css';
 import FullCalendar from '@fullcalendar/react';
 import { EventContentArg } from "@fullcalendar/core/index.js";
-// import dayGridPlugin from '@fullcalendar/daygrid';
+import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
+import seedrandom from 'seedrandom';
 
 dayjs.extend(minMax);
 
@@ -42,36 +44,90 @@ const getEarliestDate = (orders: PlannedOrder[]) => {
   }
 };
 
-const renderEventContent = (eventInfo: EventContentArg) => {
-  console.log(eventInfo)
-  const { satelliteName, groundStationName, begin, end, priority } = eventInfo.event.extendedProps;
-  const tooltipContent = (
-    <div>
-      {satelliteName} from {dayjs(begin).format('MMMM D, YYYY h:mm A')} to {dayjs(end).format('MMMM D, YYYY h:mm A')} downlinked at {groundStationName} priority {priority}
-    </div>
-  );
+function shuffle<T>(array: Array<T>, seed: string) {
+  const rng = seedrandom(seed);
+  const result = array.slice();
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
 
-  return (
-    <Tippy content={tooltipContent} placement="top">
-      <div style={{ fontSize: 10 }}>{eventInfo.timeText}</div>
-    </Tippy>
-  );
-};
+const SEED_STRING = "f8erhfw38h48hf3f8h4e803whr";
 
-const COLOR_PALETTE = [
-  '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0',
-  '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8',
-  '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080'
-];
+const COLOR_PALETTE = shuffle([
+  '#c084fc', '#f472b6', '#22d3ee', '#60a5fa', '#2dd4bf', '#4ade80', '#facc15', '#fb923c',
+  '#2f0553', '#45061f', '#072a38', '#14204a', '#032726', '#042713', '#422006', '#3b1106'
+], SEED_STRING);
+const TEXT_COLOR_PALETTE = shuffle([
+  '#000', '#000', '#000', '#000', '#000', '#000', '#000', '#000',
+  '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff'
+], SEED_STRING);
 
-function stringToColor(name: string): string {
+function stringToIndex(name: string): number {
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
-  const index = Math.abs(hash) % COLOR_PALETTE.length;
-  return COLOR_PALETTE[index];
+  return Math.abs(hash) % COLOR_PALETTE.length;
 }
+
+function stringToColor(name: string): string {
+  return COLOR_PALETTE[stringToIndex(name)];
+}
+
+function stringToTextColor(name: string): string {
+  return TEXT_COLOR_PALETTE[stringToIndex(name)];
+}
+
+const renderEventContent = (eventInfo: EventContentArg) => {
+  const {
+    longitude,
+    latitude,
+    satelliteName,
+    groundStationName,
+    jobBegin,
+    jobEnd,
+    downlinkBegin,
+    downlinkEnd,
+    priority
+  } = eventInfo.event.extendedProps;
+  const tooltipContent = (
+    <Box>
+      <div>
+        <strong>Image at:</strong>{" "}
+        {parseFloat(latitude).toFixed(5)},{" "}
+        {parseFloat(longitude).toFixed(5)}{" "}
+        ({priority == 1 ? "Low" : priority == 2 ? "Medium" : "High"} Priority)
+      </div>
+      <div>
+      </div>
+      <hr style={{ marginTop: 5, marginBottom: 5 }} />
+      <div>
+        <strong>Satellite</strong> {satelliteName} <strong>takes image</strong>
+        <br />
+        <strong>From</strong> {dayjs(jobBegin).format('MMMM D, YYYY h:mm A')}
+        <br />
+        <strong>To</strong> {dayjs(jobEnd).format('MMMM D, YYYY h:mm A')}
+      </div>
+      <hr style={{ marginTop: 5, marginBottom: 5 }} />
+      <div>
+        <strong>Downlinked via</strong> {groundStationName} ground station
+        <br />
+        <strong>From</strong> {dayjs(downlinkBegin).format('MMMM D, YYYY h:mm A')}
+        <br />
+        <strong>To</strong> {dayjs(downlinkEnd).format('MMMM D, YYYY h:mm A')}
+      </div>
+    </Box>
+  );
+
+  return (
+    <Tippy content={tooltipContent} placement="top">
+      <div style={{ fontSize: 10, color: stringToTextColor(satelliteName) }}>{eventInfo.timeText}</div>
+    </Tippy>
+  );
+};
 
 const Schedule = () => {
   const { id } = useParams();
@@ -117,9 +173,6 @@ const Schedule = () => {
     }
   }, [schedule]);
 
-  console.log(scheduleOutput)
-  console.log(scheduleOutput ? getEarliestDate(Object.values(scheduleOutput.output.planned_orders).flat()) : '')
-
   return (
     <Stack>
       {schedule
@@ -133,7 +186,7 @@ const Schedule = () => {
       {scheduleOutput
         ? (
           <FullCalendar
-            plugins={[timeGridPlugin]}
+            plugins={[timeGridPlugin, dayGridPlugin]}
             initialDate={getEarliestDate(Object.values(scheduleOutput.output.planned_orders).flat())}
             initialView="timeGridWeek"
             events={Object.entries(scheduleOutput.output.planned_orders)
@@ -145,10 +198,14 @@ const Schedule = () => {
                     end: order.job_end,
                     color: stringToColor(satelliteName),
                     extendedProps: {
+                      latitude: order.job.latitude,
+                      longitude: order.job.longitude,
                       satelliteName: order.satellite_name,
                       groundStationName: order.ground_station_name,
-                      start: order.job_begin,
-                      end: order.job_end,
+                      jobBegin: order.job_begin,
+                      jobEnd: order.job_end,
+                      downlinkBegin: order.downlink_begin,
+                      downlinkEnd: order.downlink_end,
                       priority: order.job.priority
                     }
                   })
@@ -157,6 +214,11 @@ const Schedule = () => {
             }
             eventContent={renderEventContent}
             editable={false}
+            headerToolbar={{
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            }}
           />
         )
         : (<Spinner />)}
