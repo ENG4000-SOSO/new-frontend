@@ -1,16 +1,16 @@
 import {
   Box,
-  Button,
-  ButtonGroup,
+  // Button,
+  // ButtonGroup,
   Text,
   Heading,
-  HStack,
-  Skeleton,
-  SkeletonCircle,
-  SkeletonText,
+  // HStack,
+  // Skeleton,
+  // SkeletonCircle,
+  // SkeletonText,
   Stack,
-  Steps,
-  StepsChangeDetails,
+  // Steps,
+  // StepsChangeDetails,
   Spinner,
 } from "@chakra-ui/react";
 import { toaster } from '@components/ui/toaster';
@@ -18,12 +18,12 @@ import api from '@utils/api';
 import { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
 import { ScheduleRequestType, SchedulingInputOutputData, PlannedOrder } from "@customTypes/schedule";
-import dayjs, { min } from "dayjs";
+import dayjs from "dayjs";
 import minMax from 'dayjs/plugin/minMax';
 import './schedule.css';
 import FullCalendar from '@fullcalendar/react';
 import { EventContentArg } from "@fullcalendar/core/index.js";
-import dayGridPlugin from '@fullcalendar/daygrid';
+// import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
@@ -47,7 +47,7 @@ const renderEventContent = (eventInfo: EventContentArg) => {
   const { satelliteName, groundStationName, begin, end, priority } = eventInfo.event.extendedProps;
   const tooltipContent = (
     <div>
-      {satelliteName} from {dayjs(begin).format('MMMM D, YYYY h:mm A')} to {dayjs(begin).format('MMMM D, YYYY h:mm A')} downlinked at {groundStationName} priority {priority}
+      {satelliteName} from {dayjs(begin).format('MMMM D, YYYY h:mm A')} to {dayjs(end).format('MMMM D, YYYY h:mm A')} downlinked at {groundStationName} priority {priority}
     </div>
   );
 

@@ -8,7 +8,7 @@ import {
   Field,
   Icon,
   Input,
-  NumberInput,
+  // NumberInput,
   Portal,
   Separator,
   Stack
@@ -16,14 +16,14 @@ import {
 import { toaster } from '@components/ui/toaster';
 import api from '@utils/api';
 import { useEffect, useState } from 'react';
-import { Controller,useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { GrSatellite } from 'react-icons/gr';
 import { GroundStationType, GroundStationRequestType } from "@customTypes/ground_station";
 
 const GroundStations = () => {
 
   const {
-    control,
+    // control,
     register,
     handleSubmit,
     formState: { errors },
