@@ -9,6 +9,7 @@ import Mission from '@pages/Mission';
 import Missions from '@pages/Missions';
 import Register from '@pages/Register';
 import Satellites from '@pages/Satellites';
+import Schedule from '@pages/Schedule';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
           <Route path="/groundstations" element={user ? <GroundStations /> : <Login />} />
           <Route path="/missions" element={user ? <Missions /> : <Login />} />
           <Route path="/missions/:id" element={user ? <Mission /> : <Login />} />
+          <Route path="/schedule/:id" element={user ? <Schedule /> : <Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
         </Routes>
