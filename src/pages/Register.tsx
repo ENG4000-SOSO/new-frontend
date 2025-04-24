@@ -33,7 +33,7 @@ const Register: React.FC = () => {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      const res = api.post("/auth", data);
+      const res = api.post("/auth/", data);
       console.log(await (await res).data);
       navigate("/login");
     } catch (e) {
