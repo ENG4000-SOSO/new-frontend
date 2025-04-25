@@ -1,5 +1,3 @@
-// src/pages/Login.tsx
-
 import {
   FormControl,
   FormErrorMessage,
@@ -8,13 +6,13 @@ import {
 import {
   Box,
   Button,
+  Link as ChakraLink,
   Flex,
   Heading,
   Input,
-  Link,
   Spinner,
   Stack,
-  Text
+  Text,
 } from "@chakra-ui/react";
 import { toaster } from "@components/ui/toaster";
 import { useAuth } from "@context/auth/auth_context";
@@ -22,16 +20,17 @@ import { useTheme } from "@context/theme/theme_context";
 import api from "@utils/api";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 
-type LoginFormData = {
+type RegisterFormData = {
   username: string;
   password: string;
+  confirmPassword: string;
 };
 
-const Login: React.FC = () => {
+const Register: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register: registerUser } = useAuth();
   const theme = useTheme().theme;
   const cardBg = theme === "light" ? "white" : "gray.800";
 
@@ -39,38 +38,41 @@ const Login: React.FC = () => {
     register,
     handleSubmit,
     setError,
+    watch,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormData>();
+  } = useForm<RegisterFormData>();
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: RegisterFormData) => {
+    if (data.password !== data.confirmPassword) {
+      setError("confirmPassword", {
+        type: "manual",
+        message: "Passwords do not match",
+      });
+      return;
+    }
+
     try {
-      const formData = new URLSearchParams({
-        grant_type: "password",
+      const res = await api.post("/auth/register", {
         username: data.username,
         password: data.password,
       });
 
-      const res = await api.post("/auth/token", formData, {
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      });
-
-      login({ username: data.username, token: res.data.access_token });
+      registerUser({ username: data.username, token: res.data.access_token });
       toaster.create({
-        title: "Logged In",
-        description: "Welcome back!",
+        title: "Account Created",
+        description: "Welcome!",
         type: "success",
       });
       navigate("/");
     } catch (e: any) {
-      if (e.response?.status === 401) {
-        // Show single, prominent error message
-        setError("password", {
+      if (e.response?.status === 409) {
+        setError("username", {
           type: "manual",
-          message: "Username or password is incorrect",
+          message: "Username already exists",
         });
       } else {
         toaster.create({
-          title: "Login Failed",
+          title: "Registration Failed",
           description: e.message || String(e),
           type: "error",
         });
@@ -82,7 +84,7 @@ const Login: React.FC = () => {
     <Flex minH="100vh" align="center" justify="center" p={4} bg="transparent">
       <Box bg={cardBg} p={8} rounded="md" shadow="md" maxW="md" w="full">
         <Heading mb={6} textAlign="center">
-          Log In
+          Create Account
         </Heading>
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -110,27 +112,38 @@ const Login: React.FC = () => {
               <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
             </FormControl>
 
+            <FormControl isInvalid={!!errors.confirmPassword}>
+              <FormLabel>Confirm Password</FormLabel>
+              <Input
+                type="password"
+                placeholder="Confirm your password"
+                {...register("confirmPassword", {
+                  required: "Please confirm your password",
+                })}
+              />
+              <FormErrorMessage>{errors.confirmPassword?.message}</FormErrorMessage>
+            </FormControl>
+
             <Button
               type="submit"
               colorScheme="teal"
-              variant="solid"
-              size="md"
+              width="full"
               isLoading={isSubmitting}
             >
-              {isSubmitting ? <Spinner size="sm" /> : "Log In"}
+              {isSubmitting ? <Spinner size="sm" /> : "Create Account"}
             </Button>
           </Stack>
         </form>
 
         <Text mt={4} textAlign="center" fontSize="sm">
-          Don’t have an account?{" "}
-          <Link to="/register" color="teal.500" fontWeight="medium">
-            Sign up
-          </Link>
+          Already have an account?{" "}
+          <ChakraLink as={RouterLink} to="/login" color="teal.500" fontWeight="medium">
+            Log in
+          </ChakraLink>
         </Text>
       </Box>
     </Flex>
   );
 };
 
-export default Login;
+export default Register;

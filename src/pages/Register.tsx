@@ -2,15 +2,20 @@ import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/form-contro
 import {
   Box,
   Button,
+  Link as ChakraLink,
+  Flex,
+  Heading,
   Input,
+  Spinner,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import { toaster } from "@components/ui/toaster";
+import { useTheme } from "@context/theme/theme_context";
 import api from "@utils/api";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 
 type RegisterFormData = {
   username: string;
@@ -22,6 +27,9 @@ type RegisterFormData = {
 };
 
 const Register: React.FC = () => {
+  const theme = useTheme().theme;
+  const cardBg = theme === "light" ? "white" : "gray.800";
+
   const navigate = useNavigate();
   const {
     register,
@@ -58,18 +66,11 @@ const Register: React.FC = () => {
   const password = watch("password", "");
 
   return (
-    <Box
-      minH="100vh"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      bg="gray.50"
-      p={4}
-    >
-      <Box width="400px" bg="white" p={8} borderRadius="md" boxShadow="md">
-        <Text fontSize="2xl" mb={6} textAlign="center">
+    <Flex minH="100vh" align="center" justify="center" p={4} bg="transparent">
+      <Box bg={cardBg} p={8} rounded="md" shadow="md" maxW="md" w="full">
+        <Heading mb={6} textAlign="center">
           Create Account
-        </Text>
+        </Heading>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={4}>
             <FormControl isInvalid={!!errors.username}>
@@ -154,19 +155,19 @@ const Register: React.FC = () => {
               width="full"
               isLoading={isSubmitting}
             >
-              Create Account
+              {isSubmitting ? <Spinner size="sm" /> : "Create Account"}
             </Button>
           </Stack>
         </form>
 
-        <Text mt={4} textAlign="center">
+        <Text mt={4} textAlign="center" fontSize="sm">
           Already have an account?{" "}
-          <Link to="/login" style={{ color: "#319795", textDecoration: "underline" }}>
+          <ChakraLink as={RouterLink} to="/login" color="teal.500" fontWeight="medium">
             Log in
-          </Link>
+          </ChakraLink>
         </Text>
       </Box>
-    </Box>
+    </Flex>
   );
 };
 

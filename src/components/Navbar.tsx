@@ -1,5 +1,3 @@
-// src/components/Navbar.tsx
-
 import {
   Box,
   Button,
