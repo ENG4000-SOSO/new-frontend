@@ -1,52 +1,88 @@
-import { Box, Button, Flex, Spacer } from "@chakra-ui/react";
+// src/components/Navbar.tsx
+
+import {
+  Box,
+  Button,
+  Flex,
+  Icon,
+  Spacer,
+  Switch
+} from "@chakra-ui/react";
 import { useAuth } from "@context/auth/auth_context";
+import { useTheme } from "@context/theme/theme_context";
 import React from "react";
+import { FaMoon, FaSun } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 
 const Navbar: React.FC = () => {
-  const location = useLocation();
   const { user, logout } = useAuth();
+  const { theme, switchTheme } = useTheme();
+  const location = useLocation();
 
-  // Hide the Navbar if user is not logged in or if the current page is /login or /register.
-  if (!user || location.pathname === "/login" || location.pathname === "/register") {
+  // Don’t render on login/register or if not authed
+  if (!user || ["/login", "/register"].includes(location.pathname)) {
     return null;
   }
 
+  // Choose background based on your theme context
+  const bg = theme === "light" ? "white" : "gray.900";
+
   return (
-    <Box 
-      bg="white" 
-      boxShadow="sm" 
-      p={4} 
-      position="fixed" 
-      top={0} 
-      width="100%" 
+    <Box
+      bg={bg}
+      shadow="lg"
+      px={6}
+      py={4}
+      position="fixed"
+      top={0}
+      width="100%"
       zIndex={10}
     >
-      <Flex alignItems="center">
-        {/* Navigation Buttons */}
-        <Button as={Link} to="/" variant="ghost" mr={4}>
-          Home
-        </Button>
-        <Button as={Link} to="/satellites" variant="ghost" mr={4}>
-          Satellites
-        </Button>
-        <Button as={Link} to="/ground-stations" variant="ghost" mr={4}>
-          Ground Stations
-        </Button>
-        <Button as={Link} to="/image-orders" variant="ghost" mr={4}>
-          Image Orders
-        </Button>
-        <Button as={Link} to="/outage-requests" variant="ghost" mr={4}>
-          Outage Requests
-        </Button>
-        <Button as={Link} to="/schedule" variant="ghost" mr={4}>
-          Schedule
-        </Button>
+      <Flex align="center">
+        {/* Primary nav links */}
+        {[
+          { to: "/", label: "Home" },
+          { to: "/satellites", label: "Satellites" },
+          { to: "/ground-stations", label: "Ground Stations" },
+          { to: "/image-orders", label: "Image Orders" },
+          { to: "/outage-requests", label: "Outage Requests" },
+          { to: "/schedule", label: "Schedule" },
+        ].map((item) => (
+          <Button
+            key={item.to}
+            as={Link}
+            to={item.to}
+            variant="ghost"
+            mr={4}
+          >
+            {item.label}
+          </Button>
+        ))}
+
         <Spacer />
-        <Box mr={4}>Role: {user.role}</Box>
-        <Button variant="solid" onClick={logout}>
+
+        {/* Theme toggle */}
+        <Switch.Root
+          colorPalette="white"
+          size="lg"
+          checked={theme === "dark"}
+          onCheckedChange={switchTheme}
+          paddingInline={10}
+        >
+          <Switch.HiddenInput />
+          <Switch.Control>
+            <Switch.Thumb />
+            <Switch.Indicator fallback={<Icon as={FaMoon} color="black" />}>
+              <Icon as={FaSun} color="black" />
+            </Switch.Indicator>
+          </Switch.Control>
+        </Switch.Root>
+
+        {/* Logout */}
+        <Button colorScheme="teal" onClick={logout}>
           Logout
         </Button>
+
       </Flex>
     </Box>
   );

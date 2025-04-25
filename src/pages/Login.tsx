@@ -1,18 +1,28 @@
-import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/form-control";
+// src/pages/Login.tsx
+
+import {
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+} from "@chakra-ui/form-control";
 import {
   Box,
   Button,
+  Flex,
   Heading,
   Input,
+  Link,
+  Spinner,
   Stack,
   Text
 } from "@chakra-ui/react";
 import { toaster } from "@components/ui/toaster";
 import { useAuth } from "@context/auth/auth_context";
+import { useTheme } from "@context/theme/theme_context";
 import api from "@utils/api";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type LoginFormData = {
   username: string;
@@ -22,87 +32,104 @@ type LoginFormData = {
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
+  const theme = useTheme().theme;
+  const cardBg = theme === "light" ? "white" : "gray.800";
+
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>();
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      // Prepare form data in URL-encoded format
-      const formData = new URLSearchParams();
-      formData.append("username", data.username);
-      formData.append("password", data.password);
+      const formData = new URLSearchParams({
+        grant_type: "password",
+        username: data.username,
+        password: data.password,
+      });
 
       const res = await api.post("/auth/token", formData, {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
-      const { access_token } = res.data;
-      login({ username: data.username, token: access_token });
+
+      login({ username: data.username, token: res.data.access_token });
       toaster.create({
-        title: "Login Successful",
+        title: "Logged In",
         description: "Welcome back!",
         type: "success",
       });
       navigate("/");
     } catch (e: any) {
-      toaster.create({
-        title: "Login Failed",
-        description: String(e),
-        type: "error",
-      });
-      console.error(e);
+      if (e.response?.status === 401) {
+        // Show single, prominent error message
+        setError("password", {
+          type: "manual",
+          message: "Username or password is incorrect",
+        });
+      } else {
+        toaster.create({
+          title: "Login Failed",
+          description: e.message || String(e),
+          type: "error",
+        });
+      }
     }
   };
 
-
   return (
-    <Box
-      minH="100vh"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      bg="gray.50"
-      p={4}
-    >
-      <Box width="400px" bg="white" p={8} borderRadius="md" boxShadow="md">
-        <Heading textAlign="center" mb={6}>
-          Log in
+    <Flex minH="100vh" align="center" justify="center" p={4} bg="transparent">
+      <Box bg={cardBg} p={8} rounded="md" shadow="md" maxW="md" w="full">
+        <Heading mb={6} textAlign="center">
+          Log In
         </Heading>
+
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack gap={4}>
+          <Stack spacing={4}>
             <FormControl isInvalid={!!errors.username}>
               <FormLabel>Username</FormLabel>
               <Input
-                type="text"
-                placeholder="Enter username"
-                {...register("username", { required: "Username is required" })}
+                placeholder="Enter your username"
+                {...register("username", {
+                  required: "Username is required",
+                })}
               />
-              <FormErrorMessage>
-                {errors.username && errors.username.message}
-              </FormErrorMessage>
+              <FormErrorMessage>{errors.username?.message}</FormErrorMessage>
             </FormControl>
+
             <FormControl isInvalid={!!errors.password}>
               <FormLabel>Password</FormLabel>
               <Input
                 type="password"
-                placeholder="Enter password"
-                {...register("password", { required: "Password is required" })}
+                placeholder="Enter your password"
+                {...register("password", {
+                  required: "Password is required",
+                })}
               />
-              <FormErrorMessage>
-                {errors.password && errors.password.message}
-              </FormErrorMessage>
+              <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
             </FormControl>
-            <Button type="submit" colorScheme="teal" width="full">
-              Log in
+
+            <Button
+              type="submit"
+              colorScheme="teal"
+              variant="solid"
+              size="md"
+              isLoading={isSubmitting}
+            >
+              {isSubmitting ? <Spinner size="sm" /> : "Log In"}
             </Button>
           </Stack>
         </form>
-        <Text mt={4} textAlign="center">
-          Don't have an account?{" "}
-          <Link to="/register" style={{ color: "#319795", textDecoration: "underline" }}>
-            Create one
+
+        <Text mt={4} textAlign="center" fontSize="sm">
+          Don’t have an account?{" "}
+          <Link to="/register" color="teal.500" fontWeight="medium">
+            Sign up
           </Link>
         </Text>
       </Box>
-    </Box>
+    </Flex>
   );
 };
 

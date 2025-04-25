@@ -29,6 +29,7 @@ function App() {
           <Route path="/schedule" element={user ? <Schedule /> : <Login />} />
           <Route path="/Mission" element={user ? <Mission /> : <Login />} />
           <Route path="/Missions" element={user ? <Missions /> : <Login />} />
+          <Route path="/Login" element={<Login />} />
 
           <Route path="*" element={<div>404 Not Found</div>} />
         

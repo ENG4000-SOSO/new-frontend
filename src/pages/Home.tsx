@@ -99,7 +99,7 @@ const Home: React.FC = () => {
   );
 
   return (
-    <Box p={6} bg="gray.50" minH="100vh">
+    <Box p={6}  minH="100vh">
       <Heading mb={4}>Welcome to SOSO Satellite Operations System</Heading>
       {user && (
         <Text fontSize="lg" mb={6}>
