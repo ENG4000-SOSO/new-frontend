@@ -22,15 +22,14 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 
-type RegisterFormData = {
+type LoginFormData = {
   username: string;
   password: string;
-  confirmPassword: string;
 };
 
-const Register: React.FC = () => {
+const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { register: registerUser } = useAuth();
+  const { login } = useAuth();
   const theme = useTheme().theme;
   const cardBg = theme === "light" ? "white" : "gray.800";
 
@@ -38,41 +37,37 @@ const Register: React.FC = () => {
     register,
     handleSubmit,
     setError,
-    watch,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterFormData>();
+  } = useForm<LoginFormData>();
 
-  const onSubmit = async (data: RegisterFormData) => {
-    if (data.password !== data.confirmPassword) {
-      setError("confirmPassword", {
-        type: "manual",
-        message: "Passwords do not match",
-      });
-      return;
-    }
-
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      const res = await api.post("/auth/register", {
+      const formData = new URLSearchParams({
+        grant_type: "password",
         username: data.username,
         password: data.password,
       });
 
-      registerUser({ username: data.username, token: res.data.access_token });
+      const res = await api.post("/auth/token", formData, {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
+
+      login({ username: data.username, token: res.data.access_token });
       toaster.create({
-        title: "Account Created",
-        description: "Welcome!",
+        title: "Logged In",
+        description: "Welcome back!",
         type: "success",
       });
       navigate("/");
     } catch (e: any) {
-      if (e.response?.status === 409) {
-        setError("username", {
+      if (e.response?.status === 401) {
+        setError("password", {
           type: "manual",
-          message: "Username already exists",
+          message: "Username or password is incorrect",
         });
       } else {
         toaster.create({
-          title: "Registration Failed",
+          title: "Login Failed",
           description: e.message || String(e),
           type: "error",
         });
@@ -84,7 +79,7 @@ const Register: React.FC = () => {
     <Flex minH="100vh" align="center" justify="center" p={4} bg="transparent">
       <Box bg={cardBg} p={8} rounded="md" shadow="md" maxW="md" w="full">
         <Heading mb={6} textAlign="center">
-          Create Account
+          Log In
         </Heading>
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -112,33 +107,26 @@ const Register: React.FC = () => {
               <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={!!errors.confirmPassword}>
-              <FormLabel>Confirm Password</FormLabel>
-              <Input
-                type="password"
-                placeholder="Confirm your password"
-                {...register("confirmPassword", {
-                  required: "Please confirm your password",
-                })}
-              />
-              <FormErrorMessage>{errors.confirmPassword?.message}</FormErrorMessage>
-            </FormControl>
-
             <Button
               type="submit"
               colorScheme="teal"
               width="full"
               isLoading={isSubmitting}
             >
-              {isSubmitting ? <Spinner size="sm" /> : "Create Account"}
+              {isSubmitting ? <Spinner size="sm" /> : "Log In"}
             </Button>
           </Stack>
         </form>
 
         <Text mt={4} textAlign="center" fontSize="sm">
-          Already have an account?{" "}
-          <ChakraLink as={RouterLink} to="/login" color="teal.500" fontWeight="medium">
-            Log in
+          Don’t have an account?{" "}
+          <ChakraLink
+            as={RouterLink}
+            to="/register"
+            color="teal.500"
+            fontWeight="medium"
+          >
+            Sign up
           </ChakraLink>
         </Text>
       </Box>
@@ -146,4 +134,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register;
+export default Login;
